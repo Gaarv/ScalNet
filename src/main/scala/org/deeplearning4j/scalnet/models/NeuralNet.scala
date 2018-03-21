@@ -16,6 +16,8 @@
 
 package org.deeplearning4j.scalnet.models
 
+import java.io.File
+
 import org.deeplearning4j.nn.api.OptimizationAlgorithm
 import org.deeplearning4j.nn.conf.inputs.InputType
 import org.deeplearning4j.nn.conf.{ MultiLayerConfiguration, NeuralNetConfiguration, Updater }

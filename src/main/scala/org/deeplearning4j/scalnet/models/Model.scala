@@ -16,10 +16,13 @@
 
 package org.deeplearning4j.scalnet.models
 
+import java.io.File
+
 import org.deeplearning4j.eval.Evaluation
 import org.deeplearning4j.nn.api.OptimizationAlgorithm
 import org.deeplearning4j.nn.conf.layers.{ OutputLayer => JOutputLayer }
 import org.deeplearning4j.nn.conf.{ NeuralNetConfiguration, Updater }
+import org.deeplearning4j.nn.modelimport.keras.KerasModelImport
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
 import org.deeplearning4j.optimize.api.IterationListener
 import org.deeplearning4j.scalnet.layers.core.{ Node, OutputLayer }
@@ -193,6 +196,52 @@ trait Model extends Logging {
     val output = predict(dataset)
     evaluator.eval(dataset.getLabels, output)
     evaluator
+  }
+
+  /**
+    * Save the MultiLayerNetwork to a file. Restore using 'load'.
+    *
+    * @param f File to save the network to
+    * @param saveUpdater whether to save updater
+    */
+  def save(f: File, saveUpdater: Boolean = false): Unit = model.save(f, saveUpdater)
+
+  /**
+    * Load the MultiLayerNetwork from a file.
+    *
+    * @param f File to save the network to
+    * @param loadUpdater whether to save updater
+    */
+  def load(f: File, loadUpdater: Boolean = false): MultiLayerNetwork = {
+    MultiLayerNetwork.load(f, loadUpdater)
+  }
+
+  /**
+    * Load Keras Sequential model for which the configuration was saved
+    * separately using calls to model.to_json() and model.save_weights(...).
+    * @param jsonFileName     path to JSON file storing Keras Sequential model configuration
+    * @param enforceTraining whether to enforce training configuration options
+    * @return MultiLayerNetwork
+    */
+  def loadKerasModel(jsonFileName: String, enforceTraining: Boolean = false): MultiLayerNetwork = {
+    val conf = KerasModelImport.importKerasSequentialConfiguration(jsonFileName, enforceTraining)
+    new MultiLayerNetwork(conf)
+  }
+
+  /**
+    * Load Keras Sequential model for which the configuration was saved
+    * separately using calls to model.to_json() and model.save_weights(...).
+    *
+    * @param jsonFileName     path to JSON file storing Keras Sequential model configuration
+    * @param hdf5FileName   path to HDF5 archive storing Keras model weights
+    * @param enforceTraining whether to enforce training configuration options
+    * @return MultiLayerNetwork
+    */
+  def loadKerasModelAndWeights(jsonFileName: String,
+                               hdf5FileName: String,
+                               enforceTraining: Boolean = false): MultiLayerNetwork = {
+    val conf = KerasModelImport.importKerasSequentialModelAndWeights(jsonFileName, hdf5FileName, enforceTraining)
+    new MultiLayerNetwork(conf.getLayerWiseConfigurations)
   }
 
   override def toString: String = model.getLayerWiseConfigurations.toString
