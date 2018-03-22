@@ -41,7 +41,7 @@ import scala.collection.JavaConverters._
   */
 trait Model extends Logging {
 
-  protected var layers: List[Node] = List()
+  protected var layers: List[Node] = List.empty
   protected var model: MultiLayerNetwork = _
 
   def getLayers: List[Node] = layers
@@ -53,11 +53,11 @@ trait Model extends Logging {
     * @param seed      seed to use
     * @return NeuralNetConfiguration.Builder
     */
-  def buildModelConfig(optimizer: OptimizationAlgorithm,
-                       updater: Updater,
-                       miniBatch: Boolean,
-                       biasInit: Double,
-                       seed: Long): NeuralNetConfiguration.Builder = {
+  protected def buildModelConfig(optimizer: OptimizationAlgorithm,
+                                 updater: Updater,
+                                 miniBatch: Boolean,
+                                 biasInit: Double,
+                                 seed: Long): NeuralNetConfiguration.Builder = {
     var builder: NeuralNetConfiguration.Builder = new NeuralNetConfiguration.Builder()
     if (seed != 0) {
       builder = builder.seed(seed)
@@ -75,7 +75,7 @@ trait Model extends Logging {
     *
     * @param lossFunction loss function to use
     */
-  def buildOutput(lossFunction: LossFunction): Unit =
+  protected def buildOutput(lossFunction: LossFunction): Unit =
     layers.lastOption match {
       case Some(l) if !l.isInstanceOf[OutputLayer] =>
         throw new IllegalArgumentException("Last layer must have Output trait")
@@ -212,9 +212,8 @@ trait Model extends Logging {
     * @param f File to save the network to
     * @param loadUpdater whether to save updater
     */
-  def load(f: File, loadUpdater: Boolean = false): MultiLayerNetwork = {
+  def load(f: File, loadUpdater: Boolean = false): MultiLayerNetwork =
     MultiLayerNetwork.load(f, loadUpdater)
-  }
 
   /**
     * Load Keras Sequential model for which the configuration was saved

@@ -16,14 +16,16 @@
 
 package org.deeplearning4j.scalnet.models
 
-import org.deeplearning4j.scalnet.layers.core.{ Dense, OutputLayer }
+import org.deeplearning4j.scalnet.layers.core.Dense
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction
-import org.scalatest.{ BeforeAndAfter, FunSpec }
+import org.scalatest.{ BeforeAndAfter, Matchers, WordSpec }
+
+import scala.util.Try
 
 /**
   * Created by maxpumperla on 19/07/17.
   */
-class NeuralNetTest extends FunSpec with BeforeAndAfter {
+class NeuralNetTest extends WordSpec with Matchers with BeforeAndAfter {
 
   var model: NeuralNet = NeuralNet()
   val shape = 100
@@ -32,23 +34,21 @@ class NeuralNetTest extends FunSpec with BeforeAndAfter {
     model = NeuralNet()
   }
 
-  describe("A NeuralNet network") {
+  "A NeuralNet network" should {
 
-    it("without layers should produce an IllegalArgumentException when compiled") {
-      assertThrows[java.lang.IllegalArgumentException] {
-        model.compile(null)
-      }
+    "produce an IllegalArgumentException when compiled without layers" in {
+      intercept[java.lang.IllegalArgumentException](model.compile(null))
     }
-    it("without buildOutput called should not have an output layer") {
+
+    "not have an output layer without compiled model" in {
       model.add(Dense(shape, shape))
-      assert(!model.getLayers.last.asInstanceOf[OutputLayer].output.isOutput)
+      Try(model.getNetwork.getOutputLayer).isFailure
     }
 
-    it("with buildOutput called should have an output layer") {
+    "have an output layer with compiled model" in {
       model.add(Dense(shape, shape))
-      model.buildOutput(LossFunction.NEGATIVELOGLIKELIHOOD)
-      assert(model.getLayers.last.asInstanceOf[OutputLayer].output.isOutput)
+      model.compile(LossFunction.NEGATIVELOGLIKELIHOOD)
+      Try(model.getNetwork.getOutputLayer).isSuccess
     }
-
   }
 }

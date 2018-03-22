@@ -60,13 +60,15 @@ class SequentialTest extends FunSpec with BeforeAndAfter {
 
     it("with buildOutput called should have an output layer") {
       model.add(Dense(shape, shape))
-      model.buildOutput(LossFunction.NEGATIVELOGLIKELIHOOD)
+      model.compile(LossFunction.NEGATIVELOGLIKELIHOOD)
       assert(model.getLayers.last.asInstanceOf[OutputLayer].output.isOutput)
     }
 
     it("should infer the correct shape of an incorrectly initialized layer") {
       model.add(Dense(shape, shape))
       model.add(Dense(shape, wrongInputShape))
+      println(model.getLayers.map(_.inputShape))
+      println(model.getLayers.map(_.outputShape))
       assert(model.getLayers.last.inputShape == List(shape))
     }
 
