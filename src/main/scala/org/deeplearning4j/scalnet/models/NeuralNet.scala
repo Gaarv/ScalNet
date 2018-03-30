@@ -18,9 +18,9 @@ package org.deeplearning4j.scalnet.models
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm
 import org.deeplearning4j.nn.conf.inputs.InputType
-import org.deeplearning4j.nn.conf.{ MultiLayerConfiguration, NeuralNetConfiguration, Updater }
+import org.deeplearning4j.nn.conf.{MultiLayerConfiguration, NeuralNetConfiguration, Updater}
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
-import org.deeplearning4j.scalnet.layers.core.{ Layer, Node }
+import org.deeplearning4j.scalnet.layers.core.{Layer, Node}
 import org.deeplearning4j.scalnet.logging.Logging
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction
 
@@ -66,6 +66,11 @@ object NeuralNet {
   def apply(inputType: InputType = null,
             miniBatch: Boolean = true,
             biasInit: Double = 0.0,
-            rngSeed: Long = 0): NeuralNet =
-    new NeuralNet(Option(inputType), miniBatch, biasInit, rngSeed)
+            rngSeed: Long = 0): NeuralNet = new NeuralNet(Option(inputType), miniBatch, biasInit, rngSeed)
+
+  def loadKerasModel(jsonFileName: String, enforceTraining: Boolean = false): NeuralNet =
+    NeuralNet().loadKerasModel(jsonFileName, enforceTraining)
+
+  def loadKerasModelAndWeights(jsonFileName: String, hdf5FileName: String, enforceTraining: Boolean = false): NeuralNet =
+    NeuralNet().loadKerasModelAndWeights(jsonFileName, hdf5FileName, enforceTraining)
 }

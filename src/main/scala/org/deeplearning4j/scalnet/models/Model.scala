@@ -222,9 +222,13 @@ trait Model extends Logging {
     * @param enforceTraining whether to enforce training configuration options
     * @return MultiLayerNetwork
     */
-  def loadKerasModel(jsonFileName: String, enforceTraining: Boolean = false): MultiLayerNetwork = {
+  def loadKerasModel(jsonFileName: String, enforceTraining: Boolean = false): NeuralNet = {
     val conf = KerasModelImport.importKerasSequentialConfiguration(jsonFileName, enforceTraining)
-    new MultiLayerNetwork(conf)
+    val model = new MultiLayerNetwork(conf)
+    model.init()
+    val neuralNet = NeuralNet()
+    neuralNet.model = model
+    neuralNet
   }
 
   /**
@@ -238,9 +242,13 @@ trait Model extends Logging {
     */
   def loadKerasModelAndWeights(jsonFileName: String,
                                hdf5FileName: String,
-                               enforceTraining: Boolean = false): MultiLayerNetwork = {
+                               enforceTraining: Boolean = false): NeuralNet = {
     val conf = KerasModelImport.importKerasSequentialModelAndWeights(jsonFileName, hdf5FileName, enforceTraining)
-    new MultiLayerNetwork(conf.getLayerWiseConfigurations)
+    val model = new MultiLayerNetwork(conf.getLayerWiseConfigurations)
+    model.init()
+    val neuralNet = NeuralNet()
+    neuralNet.model = model
+    neuralNet
   }
 
   override def toString: String = model.getLayerWiseConfigurations.toString

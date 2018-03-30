@@ -40,10 +40,9 @@ class Sequential(miniBatch: Boolean, biasInit: Double, rngSeed: Long) extends Mo
   private var _preprocessors: Map[Int, Node] = Map()
   private var _inputShape: List[Int] = List()
 
-  def inputShape: List[Int] = _inputShape
   def getPreprocessors: Map[Int, Node] = _preprocessors
 
-  private val noLayers = inputShape.isEmpty && layers.isEmpty && _preprocessors.isEmpty
+  private val noLayers = _inputShape.isEmpty && layers.isEmpty && _preprocessors.isEmpty
   private def emptyShape(layer: Node): Boolean =
     !(_preprocessors.contains(layers.length) || layers.nonEmpty) &&
     layer.inputShape.lengthCompare(1) == 0 && layer.inputShape.head == 0
